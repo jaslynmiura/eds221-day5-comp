@@ -78,3 +78,12 @@ height_t2(3, 1, 5)
 
 ```
 
+Testing other packages
+
+```{r}
+library(DAISYDOGS)
+
+megan_equation(12, 2)
+
+```
+
