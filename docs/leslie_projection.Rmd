@@ -4,7 +4,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE) 
 library(tidyverse)
 ```
 
@@ -32,6 +32,8 @@ The initial population structure is given by:
 ```{r}
 # Initial population structure (Roe, Fry, Juvenile, Adult): 
 fish_year0 <- c(5000, 8000, 600, 400)
+
+# is a vector that tells us the population of each age structure at time = 0
 ```
 
 
@@ -43,27 +45,31 @@ Add line-by-line comments wheres prompted in the code below, explaining what eac
 # ------ WHAT HAPPENS HERE? ------ #
 # ------ comment line-by-line ---- #
 
-# The line below...
+# The line below creates a time sequence of 8 years to estimate population size
 time_yr <- seq(from = 0, to = 8, by = 1)
 
-# The line below...
+# The line below creates an empty matrix where the columns are the life stages 
 proj_year <- matrix(ncol = length(fish_year0), nrow = length(time_yr))
 
-# The line below...
+# The line below inputs the first row with year 0 population sizes
 proj_year[1, ] <- fish_year0
 
-# The for loop below...
-for (i in 2:length(time_yr)) {
-  proj_year[i,] <- fish_leslie %*% proj_year[i-1,]
+# The for loop below estimates the population size for each year based on population size on the previous year
+for (i in 2:length(time_yr)) { # we start at 2:length(time_yr) since our first row is already filled in! we already know the population at time 0
+  proj_year[i,] <- fish_leslie %*% proj_year[i-1,] # i-1 takes LAST YEAR'S population size
 }
 
 
 # The rest is wrangling & visualization (run to check it out):
+# updating column names for the population stages
 colnames(proj_year) <- c("eggs", "fry", "juvenile", "adult")
 
+# convert to a data frame
 proj_df <- data.frame(time_yr, proj_year) %>% 
+  # convert format from wide to long
   pivot_longer(cols = -time_yr, names_to = "lifestage", values_to = "stage_population")
 
+# plot it
 ggplot(data = proj_df, aes(x = time_yr, y = stage_population)) +
   geom_line(aes(color = lifestage)) +
   scale_y_log10()
